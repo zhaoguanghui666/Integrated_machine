@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>台州公交公司管理后台</title>
+    <link rel="icon" href="imge/0.ico" type="images/x-ico"/>
+    <script src='./js/vue.js'></script>
+    <link type="text/css" rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/iconfont.css">
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+</head>
+
+<body> 
+    <div id="app">
+            <div v-if="meng" class="meng">
+                    <div class="meng_">
+                        <h1>正在上传图片....</h1>
+                    </div>  
+                </div>
+        <!-- 登陆注册 -->
+        <div class="denglu" v-if='denglu'>
+            <h1>请登陆!</h1>
+            <div>
+                <h4>用户名:</h4>
+                <input type="text" class="inpt" placeholder="请输入用户名" onfocus="this.placeholder=''" v-model="user"
+                    onblur="this.placeholder='请输入用户名'">
+            </div>
+            <div>
+                <h4>密码:</h4>
+                <input type="password" class="inpt" placeholder="请输入密码" onfocus="this.placeholder=''" v-model="pad"
+                    onblur="this.placeholder='请输入密码'">
+            </div>
+            <button @click="dengl()">登陆</button>
+        </div>
+        <!-- 内容 -->
+        <!-- head -->
+        <div v-if="!denglu">
+            <div class="headr">
+                <h2>台州公交公司管理后台</h2>
+                <div class="tuichu">
+                    <span class="iconfont icon-poweroff" @click="tuich()"></span>
+                </div>
+            </div>
+            <!-- ce body -->
+            <div class="cebian">
+                <div :class="cebian==1?'cebian-02':'cebian-01'" @click="cn(1)">
+                    <h3 class="h3-01">公司介绍管理</h3>
+                    <div :class="cebian==1?'shugang':''">
+
+                    </div>
+                </div>
+
+                <div :class="cebian==2?'cebian-02':'cebian-01'" @click="cn(2)">
+                    <h3 class="h3-01">汽车报修管理</h3>
+                    <div :class="cebian==2?'shugang':''">
+
+                    </div>
+                </div>
+                <div :class="cebian==3?'cebian-02':'cebian-01'" @click="cn(3)">
+                    <h3 class="h3-01">广告管理</h3>
+                    <div :class="cebian==3?'shugang':''">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容 -->
+            
+            <div class="neirong">
+                <div :class="cebian ==1 && gsgllinger==true ? '': 'gsgl' ">
+                    <!-- 公司介绍管理 -->
+                    <div class="liebiao">
+                        <li>序号</li>
+                        <li>公司名称</li>
+                        <li>公司标题</li>
+                        <li>公司业务</li>
+                        <li>公司简介</li>
+                        <li>操作</li>
+                    </div>
+                    <div style="height:3rem"></div>
+                    <div class="liebiao-02" v-for="(item, index) in go">
+                        <li>{{index+1}}</li>
+                        <li>{{item.bus_name}}</li>
+                        <li>{{item.bus_title}}</li>
+                        <li>{{item.bus_ywu}}</li>
+                        <li>...</li>
+                        <li>
+                            <span class="iconfont icon-edit-fill spn" @click="xiugai(index)"></span>
+                            <span class="iconfont icon-close-circle-fill spn" @click="shanchu(index)"></span>
+                        </li>
+                    </div>
+                    <div class="liebiao-03">
+                        <h3 class="iconfont icon-plus-circle he" @click="gsg(3)"></h3>
+                    </div>
+                </div>
+                <!-- 公司 修改添加页面 -->
+                <div :class="cebian ==1 && gsgllinger==false ? '': 'gsgl' ">
+                    <button class="fanhui" @click="gsgllinger = true">返回上一页</button>
+                    <div class="xg-00">
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司名称:</span>
+                            <span><input type="text" v-model="bus_name" class="it"></span>
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司标题:</span>
+                            <span><input type="text" v-model="bus_title" class="it"></span>
+                            
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司logo:</span>
+                            <span><input type="file" @change="logo()"></input></span>
+                            <div style='width:3rem;height:3rem;display:inline-block'>
+                                <img :src="logo_imge" style='width:3rem;height:3rem;'>
+                            </div>
+                        </li>
+                        <br/>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司大图:</span>
+                            <span><input type="file" @change="lo1()"></input></span>
+                            <div style='width:3rem;height:3rem;display:inline-block'>
+                                <img :src="lo" style='width:3rem;height:3rem;'>
+                            </div>
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司业务:</span>
+                            <span><input type="text" v-model="bus_ywu" class="it"></span>
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">公司简介:</span>
+                            <span><textarea type="text" v-model="bus_desc" class="it-01"
+                             style="vertical-align:top;outline:none;"></textarea></span>
+                        </li>
+                        <!-- <li class="xg-01">
+                            <span style="font-size:0.8rem;">上传图片:</span>
+                            <span><button>点击上传图片</button></span>
+                        </li> -->
+                        <li class="tijiao">
+                            <button class="tijiao-01" @click="tianjia_xg()">修改&&添加</button>
+                        </li>
+                    </div>
+                </div>
+                <!-- 汽车报修 -->
+                <div :class="cebian ==2 && gsgllinger==true ? '': 'gsgl' ">
+                    <!-- 公司介绍管理 -->
+                    <div class="liebiao">
+                        <li>序号</li>
+                        <li>维修品类</li>
+                        <li>价格</li>
+                        <li>详情</li>
+                        <li>操作</li>
+                    </div>
+                    <div style="height:3rem"></div>
+                    <div class="liebiao-02" v-for="(item, index) in bx">
+                        <li>{{index+1}}</li>
+                        <li>{{item.name}}</li>
+                        <li>{{item.price}}</li>
+                        <li>...</li>
+                        <li>
+                            <span class="iconfont icon-edit-fill spn" @click="xiuga(index)"></span>
+                            <span class="iconfont icon-close-circle-fill spn" @click="shanch(index)"></span>
+
+                        </li>
+                    </div>
+                    
+                    <div class="liebiao-03">
+                        <h3 class="iconfont icon-plus-circle he" @click="gsg()"></h3>
+                    </div>
+                </div>
+                <!-- 公司 修改添加页面 -->
+                <div :class="cebian ==2 && gsgllinger==false ? '': 'gsgl' ">
+                    <button class="fanhui" @click="gsgllinger = true">返回上一页</button>
+                    <div class="xg-00">
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">报修项目:</span>
+                            <span><input type="text" v-model="bx_name" class="it"></span>
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">报修价格:</span>
+                            <span><input type="text" v-model="bx_pic" class="it" @blur.prevent="changeCount()"></span>
+                        </li>
+                        <li class="xg-01">
+                            <span style="font-size:1rem;">报修详情:</span>
+                            <span><textarea type="text" v-model="bx_xiangqing" class="it-01"
+                                    style="vertical-align:top;outline:none;"></textarea></span>
+                        </li>
+                        <li class="tijiao">
+                            <button class="tijiao-01" @click="tianjia(2)">修改&&添加</button>
+                        </li>
+                    </div>
+                </div>
+
+                <!-- 汽车报修 -->
+
+                <!-- 广告 -->
+                <div :class="cebian == 3 && guanggao==true ? '': 'gsgl' ">
+                    <!-- 公司介绍管理
+                    <div class="liebiao">
+                        <li>序号</li>
+                        <li>广告播放位置</li>
+                        <li>广告图片</li>
+                    </div>
+                    <div style="height:3rem;"></div>
+                    <div class="liebiao-02" v-for="(item, index) in gg">
+                        <li>{{index+1}}</li>
+                        <img :src="item.imge" alt="" style="width:10;height:10rem;background-color: red;">
+                        <li>
+                            <span class="iconfont icon-edit-fill spn" @click="xiugai(index)"></span>
+                            <span class="iconfont icon-close-circle-fill spn" @click="shanchu(index)"></span>
+    
+                        </li>
+                    </div>
+                     <div class="liebiao-03">
+                        <h3 class="iconfont icon-plus-circle he" @click="guanggao = false" ></h3>
+                    </div> -->
+                    <div v-for="(item, index) in gg" class="gg_t">
+                        <div class="shouye_gg" v-if="item.id==1">
+                            <h3>首页广告图预览:</h3>
+                        </div>
+                        <div class="shouye_gg" v-if="item.id==2">
+                            <h3>待机页广告图预览:</h3>
+                        </div>
+                        <img v-if=(item.imge) :src="item.imge" class="gg_imge"  ></img>
+                            <div v-if=(!item.imge) class="gg_i">
+                                <h3>请上传图片!</h3>
+                            </div>
+                        <div class="gg_but">
+                            <button class="shan" style="background-color:dodgerblue"
+                                @click="guanggao = false ">修改</button>
+                            <button class="shan" @click="gg_shanchu(item.id)">删除</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 广告 新添内容 -->
+                <div v-if="!guanggao && cebian == 3">
+                    <button class="fanhui" @click="guanggao = true">返回上一页</button>
+                    <div class="xg-00">
+                        <li class="xg-01">
+                            <span style="font-size:0.7rem;">首页广告:</span>
+                            <span>
+                                <input type="radio" class="chen" v-model="cke" value="1" @click="inpt()">
+                            </span>
+                        </li>
+                        <br>
+                        <li class="xg-01">
+                            <span style="font-size:0.7rem;">待机广告:</span>
+                            <span>
+                                <input type="radio" class="chen" v-model="cke" value="2" @click="inpt()">
+                            </span>
+                        </li>
+                        <br>
+                        <li class="xg-01">
+                            <span style="font-size:0.8rem;">上传图片:</span>
+                            <span>
+                                <input type="file" @change="tupian()"></input>
+                            </span>
+                            <br>
+                            <br>
+                            <div style="width:200px;height:200px; " v-for="(item, index) in imgBase64">
+                                <img :src="item" style="width:200px;height:200px; ">
+                            </div>
+                            <button @click='imgBase64 = []' class="shan">删除</button>
+                        </li>
+                        <br>
+                        <!-- <li class="xg-01" v-if="cke==2">
+                            <span style="font-size:0.8rem;">上传音乐:</span>
+                            <span><button @click="inpt()">点击上传音乐</button></span>
+                        </li> -->
+                        <li class="tijiao">
+                            <button class="tijiao-01" @click="tijiao()">提交</button>
+                        </li>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+<script src='./js/index.js'></script>
+
+</html>
